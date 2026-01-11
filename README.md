@@ -257,6 +257,51 @@ npm run db:studio
 - Email verification
 - Password reset functionality
 
+## Deployment
+
+### Deploy to Vercel
+
+This project is configured for easy deployment on Vercel.
+
+**Quick Deploy:**
+1. Push your code to GitHub
+2. Import project to Vercel
+3. Add environment variables (see below)
+4. Deploy!
+
+**Detailed Instructions:**
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for complete deployment guide.
+
+### Required Environment Variables
+
+```env
+DATABASE_URL="postgresql://username:password@host:5432/database"
+JWT_SECRET="your-super-secret-jwt-key"
+NODE_ENV="production"
+```
+
+### Database Setup on Vercel
+
+**Recommended: Vercel Postgres**
+- Automatically configured when added to your project
+- Zero configuration required
+- Runs migrations automatically
+
+**Alternative: External Database**
+- Neon, Supabase, or any PostgreSQL provider
+- Add connection string to `DATABASE_URL`
+- Run migrations manually after deployment
+
+After deployment, run migrations:
+```bash
+vercel exec --prod -- npx prisma migrate deploy
+```
+
+Seed initial data:
+```bash
+vercel exec --prod -- npm run db:seed
+```
+
 ## License
 
 Private project - All rights reserved

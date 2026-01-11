@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -23,7 +22,7 @@ import { formatCurrency } from '@/lib/utils'
 const feeHeadSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
-  amount: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+  amount: z.string().refine((val) => !Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) > 0, {
     message: 'Amount must be a positive number',
   }),
 })
@@ -39,7 +38,6 @@ interface FeeHead {
 }
 
 export default function FeeHeadsPage() {
-  const router = useRouter()
   const [feeHeads, setFeeHeads] = useState<FeeHead[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -85,7 +83,7 @@ export default function FeeHeadsPage() {
           body: JSON.stringify({
             name: data.name,
             description: data.description || null,
-            amount: parseFloat(data.amount),
+            amount: Number.parseFloat(data.amount),
           }),
         })
 
@@ -105,7 +103,7 @@ export default function FeeHeadsPage() {
           body: JSON.stringify({
             name: data.name,
             description: data.description || null,
-            amount: parseFloat(data.amount),
+            amount: Number.parseFloat(data.amount),
           }),
         })
 
@@ -152,6 +150,81 @@ export default function FeeHeadsPage() {
     reset()
     setEditingId(null)
     setShowForm(false)
+  }
+
+  const renderFeeHeadsList = () => {
+    if (loading) {
+      return <div className="text-center py-8">Loading fee heads...</div>
+    }
+
+    if (feeHeads.length === 0) {
+      return (
+        <div className="text-center py-8 text-muted-foreground">
+          No fee heads found. Create your first fee head.
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-4">
+        {feeHeads.map((feeHead) => (
+          <div
+            key={feeHead.id}
+            className="border rounded-lg p-4 flex justify-between items-start"
+          >
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <h3 className="font-semibold">{feeHead.name}</h3>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    feeHead.active
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {feeHead.active ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              {feeHead.description && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {feeHead.description}
+                </p>
+              )}
+              <p className="text-lg font-medium mt-2">
+                {formatCurrency(feeHead.amount)}
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleEdit(feeHead)}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+              <Button
+                size="sm"
+                variant={feeHead.active ? 'destructive' : 'default'}
+                onClick={() => handleToggleActive(feeHead)}
+              >
+                {feeHead.active ? (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Deactivate
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Activate
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -236,72 +309,7 @@ export default function FeeHeadsPage() {
           <CardTitle>Fee Heads</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="text-center py-8">Loading fee heads...</div>
-          ) : feeHeads.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No fee heads found. Create your first fee head.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {feeHeads.map((feeHead) => (
-                <div
-                  key={feeHead.id}
-                  className="border rounded-lg p-4 flex justify-between items-start"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-semibold">{feeHead.name}</h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          feeHead.active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {feeHead.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                    {feeHead.description && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {feeHead.description}
-                      </p>
-                    )}
-                    <p className="text-lg font-medium mt-2">
-                      {formatCurrency(feeHead.amount)}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEdit(feeHead)}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleToggleActive(feeHead)}
-                    >
-                      {feeHead.active ? (
-                        <>
-                          <X className="mr-2 h-4 w-4" />
-                          Deactivate
-                        </>
-                      ) : (
-                        <>
-                          <Check className="mr-2 h-4 w-4" />
-                          Activate
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          {renderFeeHeadsList()}
         </CardContent>
       </Card>
     </div>
