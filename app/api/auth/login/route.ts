@@ -4,6 +4,9 @@ import { db } from '@/lib/db'
 import { verifyPassword, generateToken } from '@/lib/auth'
 import { z } from 'zod'
 
+// Force this route to be dynamic (not pre-rendered at build time)
+export const dynamic = 'force-dynamic'
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),

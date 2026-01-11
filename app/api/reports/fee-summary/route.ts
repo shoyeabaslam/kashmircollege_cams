@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { requirePrincipal } from '@/lib/middleware'
 import { db } from '@/lib/db'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export const GET = requirePrincipal(async (req) => {
   try {
     if (!req.user) {

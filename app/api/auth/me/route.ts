@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/middleware'
 import { db } from '@/lib/db'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export const GET = requireAuth(async (req) => {
   try {
     if (!req.user) {

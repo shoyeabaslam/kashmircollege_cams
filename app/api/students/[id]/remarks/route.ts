@@ -3,6 +3,9 @@ import { requireCounselor } from '@/lib/middleware'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const createRemarkSchema = z.object({
   remark: z.string().min(1),
 })

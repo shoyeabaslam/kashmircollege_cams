@@ -6,6 +6,9 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const uploadCertificateSchema = z.object({
   studentId: z.string(),
   documentType: z.string().min(1),

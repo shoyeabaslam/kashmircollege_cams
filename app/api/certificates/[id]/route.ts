@@ -4,6 +4,9 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { VerificationStatus } from '@prisma/client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const updateCertificateSchema = z.object({
   verificationStatus: z.nativeEnum(VerificationStatus),
 })

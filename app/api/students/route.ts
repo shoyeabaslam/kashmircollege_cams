@@ -4,6 +4,9 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { Role } from '@prisma/client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const createStudentSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),

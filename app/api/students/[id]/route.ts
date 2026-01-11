@@ -3,6 +3,9 @@ import { requireCounselor } from '@/lib/middleware'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const updateStudentSchema = z.object({
   name: z.string().min(1).optional(),
   phone: z.string().min(10).optional(),

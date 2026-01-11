@@ -3,6 +3,9 @@ import { requireAccountsOfficer } from '@/lib/middleware'
 import { db } from '@/lib/db'
 import PDFDocument from 'pdfkit'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export const GET = requireAccountsOfficer(async (req) => {
   try {
     if (!req.user) {

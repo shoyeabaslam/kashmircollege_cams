@@ -3,6 +3,9 @@ import { requireAccountsOfficer } from '@/lib/middleware'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const createTransactionSchema = z.object({
   studentId: z.string(),
   feeHeadId: z.string(),
