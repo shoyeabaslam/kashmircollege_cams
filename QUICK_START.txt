@@ -1,0 +1,23 @@
+🚀 CAMS QUICK START GUIDE
+========================
+
+1. CREATE .env.local FILE:
+   Copy your Neon database connection string and create .env.local:
+   
+   DATABASE_URL="your-neon-connection-string"
+   JWT_SECRET="your-secret-key-here"
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+2. SETUP DATABASE:
+   npm run db:generate
+   npm run db:push
+   npm run db:seed
+
+3. START SERVER:
+   npm run dev
+
+4. ACCESS APP:
+   http://localhost:3000
+   Login: counselor@cams.com / password123
+
+For detailed instructions, see SETUP.md

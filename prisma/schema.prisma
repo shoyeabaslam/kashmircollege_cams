@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMISSION_COUNSELOR
+  CERTIFICATE_OFFICER
+  ACCOUNTS_OFFICER
+  PRINCIPAL
+  DIRECTOR
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum StudentStatus {
+  PENDING
+  UNDER_REVIEW
+  CERTIFICATE_VERIFIED
+  FEES_PAID
+  COMPLETED
+  REJECTED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  counseledStudents      Student[]            @relation("CounselorStudents")
+  certifiedStudents      Student[]            @relation("CertificateOfficerStudents")
+  counselingRemarks      CounselingRemark[]
+  certificates           Certificate[]
+  feeHeads               FeeHead[]
+  feeTransactions        FeeTransaction[]
+  principalRemarks       PrincipalRemark[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Student {
+  id                   String            @id @default(cuid())
+  applicationNumber    String?           @unique
+  name                 String
+  email                String
+  phone                String
+  address              String
+  academicDetails      Json // Store academic details as JSON
+  status               StudentStatus     @default(PENDING)
+  counselorId          String
+  certificateOfficerId String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  // Relations
+  counselor            User               @relation("CounselorStudents", fields: [counselorId], references: [id])
+  certificateOfficer   User?              @relation("CertificateOfficerStudents", fields: [certificateOfficerId], references: [id])
+  counselingRemarks    CounselingRemark[]
+  certificates         Certificate[]
+  feeTransactions      FeeTransaction[]
+
+  @@index([applicationNumber])
+  @@index([counselorId])
+  @@index([status])
+}
+
+model CounselingRemark {
+  id         String   @id @default(cuid())
+  studentId  String
+  counselorId String
+  remark     String   @db.Text
+  createdAt  DateTime @default(now())
+
+  // Relations
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor  User     @relation(fields: [counselorId], references: [id])
+
+  @@index([studentId])
+  @@index([counselorId])
+}
+
+model Certificate {
+  id                 String             @id @default(cuid())
+  studentId          String
+  certificateOfficerId String
+  documentType       String // e.g., "10th Marksheet", "12th Marksheet", "Aadhar", etc.
+  fileUrl            String
+  verificationStatus VerificationStatus @default(PENDING)
+  uploadedAt         DateTime           @default(now())
+  verifiedAt         DateTime?
+
+  // Relations
+  student            Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  certificateOfficer User               @relation(fields: [certificateOfficerId], references: [id])
+
+  @@index([studentId])
+  @@index([certificateOfficerId])
+  @@index([verificationStatus])
+}
+
+model FeeHead {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?  @db.Text
+  amount          Float
+  active          Boolean  @default(true)
+  accountsOfficerId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  accountsOfficer User            @relation(fields: [accountsOfficerId], references: [id])
+  transactions    FeeTransaction[]
+
+  @@index([active])
+  @@index([accountsOfficerId])
+}
+
+model FeeTransaction {
+  id                String   @id @default(cuid())
+  studentId         String
+  feeHeadId         String
+  amount            Float
+  paymentDate       DateTime @default(now())
+  receiptNumber     String   @unique
+  accountsOfficerId String
+  createdAt         DateTime @default(now())
+
+  // Relations
+  student           Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeHead           FeeHead  @relation(fields: [feeHeadId], references: [id])
+  accountsOfficer   User     @relation(fields: [accountsOfficerId], references: [id])
+
+  @@index([studentId])
+  @@index([receiptNumber])
+  @@index([accountsOfficerId])
+  @@index([paymentDate])
+}
+
+model PrincipalRemark {
+  id         String   @id @default(cuid())
+  date       DateTime @default(now()) @db.Date
+  remark     String   @db.Text
+  principalId String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  principal  User     @relation(fields: [principalId], references: [id])
+
+  @@index([date])
+  @@index([principalId])
+}
+
