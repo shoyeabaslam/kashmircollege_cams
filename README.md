@@ -2,6 +2,8 @@
 
 A comprehensive web-based system for managing college admissions with strict role-based access control, ensuring transparency and accountability.
 
+We have to update the functionality as per the discussion
+
 ## Features
 
 ### Core Modules Implemented
